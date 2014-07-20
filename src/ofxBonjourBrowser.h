@@ -26,10 +26,12 @@ public:
     void findService(string type, string name, string ip, string domain);
     
     const vector<ofxBonjourServiceInfo> &getFoundServiceInfo() const;
+    vector<ofxBonjourServiceInfo> getLastFoundServiceInfo();
     
     void setResolveTimeout(float resolveTimeout);
     
 private:
     void *impl;
     vector<ofxBonjourServiceInfo> infos;
+    vector<ofxBonjourServiceInfo> lastFoundInfos;
 };

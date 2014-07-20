@@ -126,16 +126,24 @@ void ofxBonjourBrowser::stopBrowse() {
 }
 
 void ofxBonjourBrowser::findService(string type, string name, string ip, string domain) {
-    infos.push_back((ofxBonjourServiceInfo){
+    ofxBonjourServiceInfo info = (ofxBonjourServiceInfo){
         .type   = type,
         .name   = name,
         .ip     = ip,
         .domain = domain
-    });
+    };
+    infos.push_back(info);
+    lastFoundInfos.push_back(info);
 }
 
 const vector<ofxBonjourServiceInfo> &ofxBonjourBrowser::getFoundServiceInfo() const {
     return infos;
+}
+
+vector<ofxBonjourServiceInfo> ofxBonjourBrowser::getLastFoundServiceInfo() {
+    vector<ofxBonjourServiceInfo> tmp = lastFoundInfos;
+    lastFoundInfos.clear();
+    return tmp;
 }
 
 void ofxBonjourBrowser::setResolveTimeout(float resolveTimeout) {
