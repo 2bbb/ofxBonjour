@@ -22,4 +22,12 @@ public:
 private:
     ofxBonjourBrowser browser;
     ofxBonjourPublisher publisher;
+    
+    class NotificationReceiver : public ofxBonjourBrowserFoundNotificationReceiverInterface {
+        static const string LogTag;
+        
+        virtual void foundService(string type, string name, string ip, string domain) {
+            ofLogVerbose(LogTag) << "Found Device: " << type << ", " << name << "@" << ip << " in " << domain;
+        }
+    } receiver;
 };

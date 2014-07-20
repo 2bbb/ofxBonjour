@@ -1,10 +1,13 @@
 #include "ofApp.h"
 
+const string ofApp::NotificationReceiver::LogTag = "NotificationReceiver";
+
 //--------------------------------------------------------------
 void ofApp::setup(){
     ofSetLogLevel(OF_LOG_VERBOSE);
     
     browser.setup();
+    browser.setFoundNotificationReceiver(&receiver);
     browser.startBrowse("_ofxbonjour_example._tcp");
     
     publisher.setup();
