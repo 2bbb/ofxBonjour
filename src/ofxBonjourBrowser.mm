@@ -22,6 +22,8 @@ static const string LogTag = "ofxBonjourBrowser";
 > {
     NSNetServiceBrowser *browser;
     ofxBonjourBrowser *delegate;
+    
+    float resolveTimeout;
 }
 
 - (void)setDelegate:(ofxBonjourBrowser *)delegate;
@@ -31,6 +33,14 @@ static const string LogTag = "ofxBonjourBrowser";
 @end
 
 @implementation BonjourBrowserImpl
+
+- (instancetype)init {
+    self = [super init];
+    if(self) {
+        resolveTimeout = 5.0f;
+    }
+    return self;
+}
 
 - (void)setDelegate:(ofxBonjourBrowser *)_delegate {
     delegate = _delegate;
@@ -53,7 +63,7 @@ static const string LogTag = "ofxBonjourBrowser";
                                                             name:netService.name];
     if(service) {
         service.delegate = self;
-        [service resolveWithTimeout:5.0f];
+        [service resolveWithTimeout:resolveTimeout];
     } else {
         ofLogError(LogTag) << "connect failed.";
     }
@@ -110,4 +120,8 @@ void ofxBonjourBrowser::findService(string type, string name, string ip, string 
 
 const vector<ofxBonjourServiceInfo> &ofxBonjourBrowser::getFoundServiceInfo() const {
     return infos;
+}
+
+void ofxBonjourBrowser::setResolveTimeout(float resolveTimeout) {
+    [(BonjourBrowserImpl *)impl setResolveTimeout:resolveTimeout];
 }

@@ -26,6 +26,8 @@ public:
     
     const vector<ofxBonjourServiceInfo> &getFoundServiceInfo() const;
     
+    void setResolveTimeout(float resolveTimeout);
+    
 private:
     void *impl;
     vector<ofxBonjourServiceInfo> infos;
