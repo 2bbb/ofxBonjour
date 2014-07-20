@@ -21,7 +21,6 @@ static const string LogTag = "ofxBonjourBrowser";
     NSNetServiceBrowserDelegate
 > {
     NSNetServiceBrowser *browser;
-    NSNetService *service;
     ofxBonjourBrowser *delegate;
 }
 
@@ -49,9 +48,9 @@ static const string LogTag = "ofxBonjourBrowser";
           didFindService:(NSNetService *)netService
               moreComing:(BOOL)moreComing
 {
-    service = [[NSNetService alloc] initWithDomain:netService.domain
-                                              type:netService.type
-                                              name:netService.name];
+    NSNetService *service = [[NSNetService alloc] initWithDomain:netService.domain
+                                                            type:netService.type
+                                                            name:netService.name];
     if(service) {
         service.delegate = self;
         [service resolveWithTimeout:5.0f];
@@ -63,20 +62,25 @@ static const string LogTag = "ofxBonjourBrowser";
 #pragma mark NSNetServiceDelegate
 
 - (void)netServiceDidResolveAddress:(NSNetService *)netService {
-    //delegate of NSNetService resolution process
     NSString *name = netService.name;
     NSString *ip = [self getStringFromAddressData:[netService.addresses objectAtIndex:0]];
     NSString *type = netService.type;
     NSString *domain = netService.domain;
-    ofLogVerbose(LogTag) << "found:" << type.UTF8String << " : " << name.UTF8String << " = " << ip.UTF8String;
+    ofLogVerbose(LogTag) << "found: " << type.UTF8String << " : " << name.UTF8String << " = " << ip.UTF8String;
     
     delegate->findService(type.UTF8String, name.UTF8String, ip.UTF8String, domain.UTF8String);
+    [netService release];
 }
 
 - (NSString *)getStringFromAddressData:(NSData *)dataIn {
     struct sockaddr_in  *socketAddress = (struct sockaddr_in *)[dataIn bytes];
     NSString *ipString = @(inet_ntoa(socketAddress->sin_addr));  ///problem here
     return ipString;
+}
+
+- (void)dealloc {
+    [browser release];
+    [super dealloc];
 }
 
 @end

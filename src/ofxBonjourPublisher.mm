@@ -35,7 +35,6 @@ static const string LogTag = "ofxBonjourPublisher";
                                                   name:name
                                                   port:port];
         if (service) {
-//            service.delegate = self;
             [service scheduleInRunLoop:[NSRunLoop currentRunLoop] forMode:NSRunLoopCommonModes];
             [service publish];
         } else {
@@ -46,17 +45,12 @@ static const string LogTag = "ofxBonjourPublisher";
     }
 }
 
-//- (void)netServiceDidPublish:(NSNetService *)sender
-//{
-//    NSLog(@"%@", [sender description]);
-//    socketHandle = [[NSFileHandle alloc] initWithFileDescriptor:socket.socket
-//                                                  closeOnDealloc:YES];
-//    if (socketHandle) {
-//        NSLog(@"has sockethandle");
-//        [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(acceptConnect:) name:NSFileHandleConnectionAcceptedNotification object:socketHandle_];
-//        [socketHandle_ acceptConnectionInBackgroundAndNotify];
-//    }
-//}
+- (void)dealloc {
+    [socket release];
+    [service release];
+    
+    [super dealloc];
+}
 
 @end
 
