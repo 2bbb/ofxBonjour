@@ -90,7 +90,7 @@ static const string LogTag = "ofxBonjourBrowser";
     NSString *domain = netService.domain;
     ofLogVerbose(LogTag) << "found: " << type.UTF8String << " : " << name.UTF8String << " = " << ip.UTF8String;
     
-    delegate->findService(type.UTF8String, name.UTF8String, ip.UTF8String, domain.UTF8String);
+    delegate->foundService(type.UTF8String, name.UTF8String, ip.UTF8String, domain.UTF8String);
     [netService release];
 }
 
@@ -111,6 +111,7 @@ ofxBonjourBrowser::ofxBonjourBrowser()
     : impl([[BonjourBrowserImpl alloc] init])
 {
     [(BonjourBrowserImpl *)impl setDelegate:this];
+    receiver = NULL;
 }
 
 void ofxBonjourBrowser::setup() {
@@ -125,7 +126,10 @@ void ofxBonjourBrowser::stopBrowse() {
     [(BonjourBrowserImpl *)impl stopBrowse];
 }
 
-void ofxBonjourBrowser::findService(string type, string name, string ip, string domain) {
+void ofxBonjourBrowser::foundService(string type, string name, string ip, string domain) {
+    if(receiver != NULL) {
+        receiver->foundService(type, name, ip, domain);
+    }
     ofxBonjourServiceInfo info = (ofxBonjourServiceInfo){
         .type   = type,
         .name   = name,
@@ -148,4 +152,8 @@ vector<ofxBonjourServiceInfo> ofxBonjourBrowser::getLastFoundServiceInfo() {
 
 void ofxBonjourBrowser::setResolveTimeout(float resolveTimeout) {
     [(BonjourBrowserImpl *)impl setResolveTimeout:resolveTimeout];
+}
+
+void ofxBonjourBrowser::setFoundNotificationReceiver(ofxBonjourBrowserFoundNotificationReceiverInterface *receiver) {
+    this->receiver = receiver;
 }
