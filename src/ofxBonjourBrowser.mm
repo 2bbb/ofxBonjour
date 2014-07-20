@@ -54,6 +54,10 @@ static const string LogTag = "ofxBonjourBrowser";
     [browser searchForServicesOfType:type inDomain:domain];
 }
 
+- (void)setResolveTimeout:(float)_resolveTimeout {
+    resolveTimeout = _resolveTimeout;
+}
+
 -(void)netServiceBrowser:(NSNetServiceBrowser *)netServiceBrowser
           didFindService:(NSNetService *)netService
               moreComing:(BOOL)moreComing
