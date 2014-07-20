@@ -29,6 +29,8 @@ static const string LogTag = "ofxBonjourBrowser";
 - (void)setDelegate:(ofxBonjourBrowser *)delegate;
 - (void)startBrowse:(NSString *)type
           forDomain:(NSString *)domain;
+- (void)stopBrowse;
+- (void)setResolveTimeout:(float)resolveTimeout;
 
 @end
 
@@ -54,9 +56,15 @@ static const string LogTag = "ofxBonjourBrowser";
     [browser searchForServicesOfType:type inDomain:domain];
 }
 
+- (void)stopBrowse {
+    [browser stop];
+}
+
 - (void)setResolveTimeout:(float)_resolveTimeout {
     resolveTimeout = _resolveTimeout;
 }
+
+#pragma mark NSNetServiceBrowserDelegate
 
 -(void)netServiceBrowser:(NSNetServiceBrowser *)netServiceBrowser
           didFindService:(NSNetService *)netService
@@ -111,6 +119,10 @@ void ofxBonjourBrowser::setup() {
 void ofxBonjourBrowser::startBrowse(string type, string domain) {
     [(BonjourBrowserImpl *)impl startBrowse:@(type.c_str())
                                   forDomain:@(domain.c_str())];
+}
+
+void ofxBonjourBrowser::stopBrowse() {
+    [(BonjourBrowserImpl *)impl stopBrowse];
 }
 
 void ofxBonjourBrowser::findService(string type, string name, string ip, string domain) {
