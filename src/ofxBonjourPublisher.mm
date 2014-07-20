@@ -6,6 +6,7 @@
 //
 
 #include "ofxBonjourPublisher.h"
+#include "ofxBonjourConstant.h"
 
 static const string LogTag = "ofxBonjourPublisher";
 
