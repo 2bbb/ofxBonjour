@@ -108,10 +108,12 @@ ofxBonjourBrowser::ofxBonjourBrowser()
 void ofxBonjourBrowser::setup() {
 }
 
-bool ofxBonjourBrowser::startBrowse(string type, string domain) {
+void ofxBonjourBrowser::startBrowse(string type, string domain) {
     [(BonjourBrowserImpl *)impl startBrowse:@(type.c_str())
                                   forDomain:@(domain.c_str())];
 }
+
+void
 
 void ofxBonjourBrowser::findService(string type, string name, string ip, string domain) {
     infos.push_back((ofxBonjourServiceInfo){

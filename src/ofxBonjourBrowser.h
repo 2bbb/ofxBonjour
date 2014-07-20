@@ -21,7 +21,7 @@ public:
     ofxBonjourBrowser();
     
     void setup();
-    bool startBrowse(string type, string domain = "");
+    void startBrowse(string type, string domain = "");
     void findService(string type, string name, string ip, string domain);
     
     const vector<ofxBonjourServiceInfo> &getFoundServiceInfo() const;
