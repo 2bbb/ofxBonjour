@@ -26,7 +26,7 @@ private:
     class NotificationReceiver : public ofxBonjourBrowserFoundNotificationReceiverInterface {
         static const string LogTag;
         
-        virtual void foundService(string type, string name, string ip, string domain) {
+        virtual void foundService(const string &type, const string &name, const string &ip, const string &domain) {
             ofLogVerbose(LogTag) << "Found Device: " << type << ", " << name << "@" << ip << " in " << domain;
         }
     } receiver;

@@ -18,7 +18,7 @@ struct ofxBonjourServiceInfo {
 
 class ofxBonjourBrowserFoundNotificationReceiverInterface {
 public:
-    virtual void foundService(string type, string name, string ip, string domain) = 0;
+    virtual void foundService(const string &type, const string &name, const string &ip, const string &domain) = 0;
 };
 
 class ofxBonjourBrowser {
@@ -26,9 +26,9 @@ public:
     ofxBonjourBrowser();
     
     void setup();
-    void startBrowse(string type, string domain = "");
+    void startBrowse(const string &type, const string &domain = "");
     void stopBrowse();
-    void foundService(string type, string name, string ip, string domain);
+    void foundService(const string &type, const string &name, const string &ip, const string &domain);
     
     const vector<ofxBonjourServiceInfo> &getFoundServiceInfo() const;
     vector<ofxBonjourServiceInfo> getLastFoundServiceInfo();
