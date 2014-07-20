@@ -113,8 +113,6 @@ void ofxBonjourBrowser::startBrowse(string type, string domain) {
                                   forDomain:@(domain.c_str())];
 }
 
-void
-
 void ofxBonjourBrowser::findService(string type, string name, string ip, string domain) {
     infos.push_back((ofxBonjourServiceInfo){
         .type   = type,
