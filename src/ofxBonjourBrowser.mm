@@ -82,9 +82,10 @@ static const string LogTag = "ofxBonjourBrowser";
     NSString *ip = [self getStringFromAddressData:[netService.addresses objectAtIndex:0]];
     NSString *type = netService.type;
     NSString *domain = netService.domain;
-    ofLogVerbose(LogTag) << "found: " << type.UTF8String << " : " << name.UTF8String << " = " << ip.UTF8String;
+    int port = netService.port;
+    ofLogVerbose(LogTag) << "found: " << type.UTF8String << " : " << name.UTF8String << " = " << ip.UTF8String << ":" << port;
     
-    delegate->foundService(type.UTF8String, name.UTF8String, ip.UTF8String, domain.UTF8String);
+    delegate->foundService(type.UTF8String, name.UTF8String, ip.UTF8String, domain.UTF8String, port);
     [netService release];
 }
 
@@ -120,15 +121,16 @@ void ofxBonjourBrowser::stopBrowse() {
     [(BonjourBrowserImpl *)impl stopBrowse];
 }
 
-void ofxBonjourBrowser::foundService(const string &type, const string &name, const string &ip, const string &domain) {
+void ofxBonjourBrowser::foundService(const string &type, const string &name, const string &ip, const string &domain, const int port) {
     if(receiver != NULL) {
-        receiver->foundService(type, name, ip, domain);
+        receiver->foundService(type, name, ip, domain, port);
     }
     ofxBonjourServiceInfo info = (ofxBonjourServiceInfo){
         .type   = type,
         .name   = name,
         .ip     = ip,
-        .domain = domain
+        .domain = domain,
+        .port   = port
     };
     infos.push_back(info);
     lastFoundInfos.push_back(info);
