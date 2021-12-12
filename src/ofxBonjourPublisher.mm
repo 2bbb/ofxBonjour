@@ -7,8 +7,10 @@
 
 #include "ofxBonjourPublisher.h"
 #include "ofxBonjourConstant.h"
+ 
+#include "ofLog.h"
 
-static const string LogTag = "ofxBonjourPublisher";
+static const std::string LogTag = "ofxBonjourPublisher";
 
 @interface BonjourPublisherImpl : NSObject {
     NSSocketPort* socket;
@@ -66,7 +68,7 @@ void ofxBonjourPublisher::setup() {
     
 }
 
-bool ofxBonjourPublisher::publish(string type, string name, int port, string domain) {
+bool ofxBonjourPublisher::publish(std::string type, std::string name, std::uint16_t port, std::string domain) {
     return [(BonjourPublisherImpl *)impl publishForType:@(type.c_str())
                                                    name:@(name.c_str())
                                                    port:port

@@ -7,19 +7,20 @@
 
 #pragma once
 
-#include "ofMain.h"
+#include <string>
+#include <vector>
 
 struct ofxBonjourServiceInfo {
-    string type;
-    string name;
-    string ip;
-    string domain;
-    int port;
+    std::string type;
+    std::string name;
+    std::string ip;
+    std::string domain;
+    std::uint16_t port;
 };
 
 class ofxBonjourBrowserFoundNotificationReceiverInterface {
 public:
-    virtual void foundService(const string &type, const string &name, const string &ip, const string &domain, const int port) = 0;
+    virtual void foundService(const std::string &type, const std::string &name, const std::string &ip, const std::string &domain, const std::uint16_t port) = 0;
 };
 
 class ofxBonjourBrowser {
@@ -27,20 +28,20 @@ public:
     ofxBonjourBrowser();
     
     void setup();
-    void startBrowse(const string &type, const string &domain = "");
+    void startBrowse(const std::string &type, const std::string &domain = "");
     void stopBrowse();
-    void foundService(const string &type, const string &name, const string &ip, const string &domain, const int port);
+    void foundService(const std::string &type, const std::string &name, const std::string &ip, const std::string &domain, const std::uint16_t port);
     
-    const vector<ofxBonjourServiceInfo> &getFoundServiceInfo() const;
-    vector<ofxBonjourServiceInfo> getLastFoundServiceInfo();
+    const std::vector<ofxBonjourServiceInfo> &getFoundServiceInfo() const;
+    std::vector<ofxBonjourServiceInfo> getLastFoundServiceInfo();
     
     void setResolveTimeout(float resolveTimeout);
     void setFoundNotificationReceiver(ofxBonjourBrowserFoundNotificationReceiverInterface *receiver);
     
 private:
     void *impl;
-    vector<ofxBonjourServiceInfo> infos;
-    vector<ofxBonjourServiceInfo> lastFoundInfos;
+    std::vector<ofxBonjourServiceInfo> infos;
+    std::vector<ofxBonjourServiceInfo> lastFoundInfos;
     
     ofxBonjourBrowserFoundNotificationReceiverInterface *receiver;
 };

@@ -8,7 +8,9 @@
 #include "ofxBonjourBrowser.h"
 #include "ofxBonjourConstant.h"
 
-static const string LogTag = "ofxBonjourBrowser";
+#include "ofLog.h"
+
+static const std::string LogTag = "ofxBonjourBrowser";
 
 @interface BonjourBrowserImpl : NSObject <
     NSNetServiceDelegate,
@@ -82,7 +84,7 @@ static const string LogTag = "ofxBonjourBrowser";
     NSString *ip = [self getStringFromAddressData:[netService.addresses objectAtIndex:0]];
     NSString *type = netService.type;
     NSString *domain = netService.domain;
-    int port = netService.port;
+    std::uint16_t port = netService.port;
     ofLogVerbose(LogTag) << "found: " << type.UTF8String << " : " << name.UTF8String << " = " << ip.UTF8String << ":" << port;
     
     delegate->foundService(type.UTF8String, name.UTF8String, ip.UTF8String, domain.UTF8String, port);
@@ -112,7 +114,7 @@ ofxBonjourBrowser::ofxBonjourBrowser()
 void ofxBonjourBrowser::setup() {
 }
 
-void ofxBonjourBrowser::startBrowse(const string &type, const string &domain) {
+void ofxBonjourBrowser::startBrowse(const std::string &type, const std::string &domain) {
     [(BonjourBrowserImpl *)impl startBrowse:@(type.c_str())
                                   forDomain:@(domain.c_str())];
 }
@@ -121,7 +123,12 @@ void ofxBonjourBrowser::stopBrowse() {
     [(BonjourBrowserImpl *)impl stopBrowse];
 }
 
-void ofxBonjourBrowser::foundService(const string &type, const string &name, const string &ip, const string &domain, const int port) {
+void ofxBonjourBrowser::foundService(const std::string &type,
+                                     const std::string &name,
+                                     const std::string &ip,
+                                     const std::string &domain,
+                                     const std::uint16_t port)
+{
     if(receiver != NULL) {
         receiver->foundService(type, name, ip, domain, port);
     }
@@ -136,12 +143,12 @@ void ofxBonjourBrowser::foundService(const string &type, const string &name, con
     lastFoundInfos.push_back(info);
 }
 
-const vector<ofxBonjourServiceInfo> &ofxBonjourBrowser::getFoundServiceInfo() const {
+const std::vector<ofxBonjourServiceInfo> &ofxBonjourBrowser::getFoundServiceInfo() const {
     return infos;
 }
 
-vector<ofxBonjourServiceInfo> ofxBonjourBrowser::getLastFoundServiceInfo() {
-    vector<ofxBonjourServiceInfo> tmp = lastFoundInfos;
+std::vector<ofxBonjourServiceInfo> ofxBonjourBrowser::getLastFoundServiceInfo() {
+    std::vector<ofxBonjourServiceInfo> tmp = lastFoundInfos;
     lastFoundInfos.clear();
     return tmp;
 }

@@ -7,14 +7,17 @@
 
 #pragma once
 
-#include "ofMain.h"
+#include "ofConstants.h"
+
+#include <string>
+#include <cstdint>
 
 class ofxBonjourPublisher {
 public:
     ofxBonjourPublisher();
     ~ofxBonjourPublisher();
     void setup();
-    bool publish(string type, string name, int port, string domain = "");
+    bool publish(std::string type, std::string name, std::uint16_t port, std::string domain = "");
 private:
     void *impl;
 };

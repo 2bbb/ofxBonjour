@@ -5,6 +5,10 @@
 //
 //
 
+#pragma once
+
+#include "ofConstants.h"
+
 #import <Cocoa/Cocoa.h>
 #import <CFNetwork/CFNetwork.h>
 
