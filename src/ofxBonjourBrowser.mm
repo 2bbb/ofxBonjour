@@ -80,14 +80,19 @@ static const std::string LogTag = "ofxBonjourBrowser";
 #pragma mark NSNetServiceDelegate
 
 - (void)netServiceDidResolveAddress:(NSNetService *)netService {
-    NSString *name = netService.name;
-    NSString *ip = [self getStringFromAddressData:[netService.addresses objectAtIndex:0]];
-    NSString *type = netService.type;
-    NSString *domain = netService.domain;
-    std::uint16_t port = netService.port;
-    ofLogVerbose(LogTag) << "found: " << type.UTF8String << " : " << name.UTF8String << " = " << ip.UTF8String << ":" << port;
-    
-    delegate->foundService(type.UTF8String, name.UTF8String, ip.UTF8String, domain.UTF8String, port);
+    if ([netService.addresses count] >0) {
+        NSString *name = netService.name;
+        NSString *ip = [self getStringFromAddressData:[netService.addresses objectAtIndex:0]];
+        NSString *type = netService.type;
+        NSString *domain = netService.domain;
+        std::uint16_t port = netService.port;
+        ofLogVerbose(LogTag) << "found: " << type.UTF8String << " : " << name.UTF8String << " = " << ip.UTF8String << ":" << port;
+        
+        delegate->foundService(type.UTF8String, name.UTF8String, ip.UTF8String, domain.UTF8String, port);
+    } else {
+        ofLogVerbose(LogTag) << "found, but empty addresses: " << netService.name.UTF8String;
+        
+    }
     [netService release];
 }
 
