@@ -18,6 +18,9 @@ public:
     ~ofxBonjourPublisher();
     void setup();
     bool publish(std::string type, std::string name, std::uint16_t port, std::string domain = "");
+    bool setTextRecord(std::string key, std::string value) { setTextRecord({{key, value}}); };
+    bool setTextRecord(std::vector<std::pair<std::string, std::string>> key_values);
+
 private:
     void *impl;
 };
