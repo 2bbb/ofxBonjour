@@ -22,6 +22,8 @@ static const std::string LogTag = "ofxBonjourPublisher";
                   port:(int)port
                 domain:(NSString *)domain;
 
+- (BOOL)setTXTRecordData:(NSDictionary *)record;
+
 @end
 
 @implementation BonjourPublisherImpl
@@ -55,7 +57,7 @@ static const std::string LogTag = "ofxBonjourPublisher";
 
         return [service setTXTRecordData:[NSNetService dataFromTXTRecordDictionary:record]];
     } else {
-        ofLogVerbose(LogTag) << "cannot set mDNS data: service not instanciated";
+        ofLogVerbose(LogTag) << "cannot set mDNS data: NSNetSevice not instanciated";
         return NO;
     }
 }
@@ -87,10 +89,8 @@ bool ofxBonjourPublisher::publish(std::string type, std::string name, std::uint1
                                                  domain:@(domain.c_str())] ? true : false;
 }
 
-bool ofxBonjourPublisher::setTextRecord(std::vector<std::pair<std::string, std::string>> key_values) {
-    
+bool ofxBonjourPublisher::setTextRecord(std::vector<std::pair<std::string, std::string>> key_values = {}) {
     NSMutableDictionary * record = [NSMutableDictionary dictionary];
     for (const auto & [key, value]: key_values) [record setValue:@(value.c_str()) forKey: @(key.c_str())];
     return [(BonjourPublisherImpl *)impl setTXTRecordData:record];
 }
-
