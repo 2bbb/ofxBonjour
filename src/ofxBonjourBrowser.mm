@@ -89,6 +89,10 @@ static const std::string LogTag = "ofxBonjourBrowser";
 
 #pragma mark NSNetServiceDelegate
 
+- (void)netServiceBrowser:(NSNetServiceBrowser *)browser didNotSearch:(NSDictionary<NSString *, NSNumber *> *)errorDict {
+    NSLog(@"ofxBonjourBrowser: could not start browsing [%@] -- if \"NSNetServicesErrorCode\": -72008, make sure the service type is included in the \"Bonjour Services\" array in info.plist ", errorDict);
+}
+
 - (void)netServiceDidResolveAddress:(NSNetService *)netService {
     if ([netService.addresses count] >0) {
         NSString *name = netService.name;
