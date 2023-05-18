@@ -13,7 +13,7 @@
 static const std::string LogTag = "ofxBonjourPublisher";
 
 @interface BonjourPublisherImpl : NSObject {
-    NSSocketPort* socket;
+//    NSSocketPort* socket;
     NSNetService *service;
 }
 
@@ -33,8 +33,9 @@ static const std::string LogTag = "ofxBonjourPublisher";
                   port:(int)port
                 domain:(NSString *)domain
 {
-    socket = [[NSSocketPort alloc] initWithTCPPort:port];
-    if (socket) {
+//    socket = [[NSSocketPort alloc] initWithTCPPort:port];
+//    if (socket) {
+    
         service = [[NSNetService alloc] initWithDomain:domain
                                                   type:type
                                                   name:name
@@ -44,10 +45,13 @@ static const std::string LogTag = "ofxBonjourPublisher";
             [service publish];
         } else {
             ofLogVerbose(LogTag) << "invalid NSNetSevice";
+            return NO;
         }
-    } else {
-        ofLogVerbose(LogTag) << "invalid NSSocketPort";
-    }
+//    } else {
+//        ofLogVerbose(LogTag) << "invalid NSSocketPort";
+//        return NO;
+//    }
+    return YES;
 }
 
 - (BOOL)setTXTRecordData:(NSDictionary *)record
