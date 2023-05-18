@@ -9,6 +9,7 @@
 #include "ofxBonjourConstant.h"
 
 #include "ofLog.h"
+#include <map>
 
 static const std::string LogTag = "ofxBonjourBrowser";
 
@@ -27,6 +28,9 @@ static const std::string LogTag = "ofxBonjourBrowser";
           forDomain:(NSString *)domain;
 - (void)stopBrowse;
 - (void)setResolveTimeout:(float)resolveTimeout;
+
+@property (nonatomic, strong) NSMutableArray *services;
+
 
 @end
 
@@ -66,14 +70,20 @@ static const std::string LogTag = "ofxBonjourBrowser";
           didFindService:(NSNetService *)netService
               moreComing:(BOOL)moreComing
 {
-    NSNetService *service = [[NSNetService alloc] initWithDomain:netService.domain
-                                                            type:netService.type
-                                                            name:netService.name];
-    if(service) {
-        service.delegate = self;
-        [service resolveWithTimeout:resolveTimeout];
-    } else {
-        ofLogError(LogTag) << "connect failed.";
+//    NSNetService *service = [[NSNetService alloc] initWithDomain:netService.domain
+//                                                            type:netService.type
+//                                                            name:netService.name];
+//
+    if (!self.services) {
+        self.services = [[NSMutableArray alloc] init];
+    }
+
+    [self.services addObject:netService];
+    [netService setDelegate:self];
+    [netService resolveWithTimeout:3.0];
+    
+    if (moreComing) {
+        ofLogNotice("more coming?!");
     }
 }
 
