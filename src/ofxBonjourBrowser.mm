@@ -118,17 +118,12 @@ static const std::string LogTag = "ofxBonjourBrowser";
     return ipString;
 }
 
-- (void)dealloc {
-    [browser release];
-    [super dealloc];
-}
-
 @end
 
 ofxBonjourBrowser::ofxBonjourBrowser()
-    : impl([[BonjourBrowserImpl alloc] init])
+: impl((__bridge_retained void *)[[BonjourBrowserImpl alloc] init])
 {
-    [(BonjourBrowserImpl *)impl setDelegate:this];
+    [(__bridge BonjourBrowserImpl *)impl setDelegate:this];
     receiver = NULL;
 }
 
@@ -136,12 +131,12 @@ void ofxBonjourBrowser::setup() {
 }
 
 void ofxBonjourBrowser::startBrowse(const std::string &type, const std::string &domain) {
-    [(BonjourBrowserImpl *)impl startBrowse:@(type.c_str())
-                                  forDomain:@(domain.c_str())];
+    [(__bridge BonjourBrowserImpl *)impl startBrowse:@(type.c_str())
+                                           forDomain:@(domain.c_str())];
 }
 
 void ofxBonjourBrowser::stopBrowse() {
-    [(BonjourBrowserImpl *)impl stopBrowse];
+    [(__bridge BonjourBrowserImpl *)impl stopBrowse];
 }
 
 void ofxBonjourBrowser::foundService(const std::string &type,
@@ -177,7 +172,7 @@ std::vector<ofxBonjourServiceInfo> ofxBonjourBrowser::getLastFoundServiceInfo() 
 }
 
 void ofxBonjourBrowser::setResolveTimeout(float resolveTimeout) {
-    [(BonjourBrowserImpl *)impl setResolveTimeout:resolveTimeout];
+    [(__bridge BonjourBrowserImpl *)impl setResolveTimeout:resolveTimeout];
 }
 
 void ofxBonjourBrowser::setFoundNotificationReceiver(ofxBonjourBrowserFoundNotificationReceiverInterface *receiver) {

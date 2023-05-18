@@ -62,28 +62,26 @@ static const std::string LogTag = "ofxBonjourPublisher";
     }
 }
 
-- (void)dealloc {
-    [socket release];
-    [service release];
-    
-    [super dealloc];
-}
+//- (void)dealloc {
+//    [socket release];
+//    [service release];
+//
+//    [super dealloc];
+//}
 
 @end
 
 ofxBonjourPublisher::ofxBonjourPublisher()
-    : impl([[BonjourPublisherImpl alloc] init]) {}
+: impl((__bridge_retained void *)[[BonjourPublisherImpl alloc] init]) {}
 
-ofxBonjourPublisher::~ofxBonjourPublisher() {
-    [(BonjourPublisherImpl *)impl release];
-}
+//__bridge
 
-void ofxBonjourPublisher::setup() {
-    
-}
+//void ofxBonjourPublisher::setup() {
+//    
+//}
 
 bool ofxBonjourPublisher::publish(std::string type, std::string name, std::uint16_t port, std::string domain) {
-    return [(BonjourPublisherImpl *)impl publishForType:@(type.c_str())
+    return [(__bridge BonjourPublisherImpl *)impl publishForType:@(type.c_str())
                                                    name:@(name.c_str())
                                                    port:port
                                                  domain:@(domain.c_str())] ? true : false;
