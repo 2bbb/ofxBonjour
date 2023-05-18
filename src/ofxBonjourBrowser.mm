@@ -83,17 +83,33 @@ static const std::string LogTag = "ofxBonjourBrowser";
     if ([netService.addresses count] >0) {
         NSString *name = netService.name;
         NSString *ip = [self getStringFromAddressData:[netService.addresses objectAtIndex:0]];
+        ofLogNotice("IPs found for ") << [name UTF8String];
+        for (id object in netService.addresses) {
+            NSString *v = [self getStringFromAddressData:object];
+            ofLogNotice("...") << [v UTF8String];
+            if ( ![v isEqualToString:@"0.0.0.0"] && ! [v hasPrefix:@"169"]) {
+                ip = v;
+            }
+        }
         NSString *type = netService.type;
         NSString *domain = netService.domain;
         std::uint16_t port = netService.port;
-        ofLogVerbose(LogTag) << "found: " << type.UTF8String << " : " << name.UTF8String << " = " << ip.UTF8String << ":" << port;
+        ofLogNotice(LogTag) << "found: " << type.UTF8String << " : " << name.UTF8String << " = " << ip.UTF8String << ":" << port;
         
-        delegate->foundService(type.UTF8String, name.UTF8String, ip.UTF8String, domain.UTF8String, port);
+        std::map<std::string, std::string> txt;
+        
+        NSDictionary * dict = [NSNetService dictionaryFromTXTRecordData:netService.TXTRecordData];
+
+        for (NSString *nskey in dict) {
+            std::string key = [nskey UTF8String];
+            std::string val = [[[NSString alloc] initWithData:[dict objectForKey:nskey] encoding:NSUTF8StringEncoding] UTF8String];
+            txt[key] = val;
+        }
+            
+        delegate->foundService(type.UTF8String, name.UTF8String, ip.UTF8String, domain.UTF8String, port, txt);
     } else {
-        ofLogVerbose(LogTag) << "found, but empty addresses: " << netService.name.UTF8String;
-        
+        ofLogNotice(LogTag) << "found, but empty addresses: " << netService.name.UTF8String;
     }
-    [netService release];
 }
 
 - (NSString *)getStringFromAddressData:(NSData *)dataIn {
@@ -132,10 +148,12 @@ void ofxBonjourBrowser::foundService(const std::string &type,
                                      const std::string &name,
                                      const std::string &ip,
                                      const std::string &domain,
-                                     const std::uint16_t port)
+                                     const std::uint16_t port,
+                                     std::map<std::string,std::string> txt)
 {
+    ofLogNotice("ofxBonjourBrowser::foundService()");
     if(receiver != NULL) {
-        receiver->foundService(type, name, ip, domain, port);
+        receiver->foundService(type, name, ip, domain, port, txt);
     }
     ofxBonjourServiceInfo info = (ofxBonjourServiceInfo){
         .type   = type,
