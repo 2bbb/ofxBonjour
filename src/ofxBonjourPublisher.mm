@@ -87,8 +87,8 @@ bool ofxBonjourPublisher::publish(std::string type, std::string name, std::uint1
                                                  domain:@(domain.c_str())] ? true : false;
 }
 
-bool ofxBonjourPublisher::setTextRecord(std::vector<std::pair<std::string, std::string>> key_values = {}) {
+bool ofxBonjourPublisher::setTextRecords(std::vector<std::pair<std::string, std::string>> key_values = {}) {
     NSMutableDictionary * record = [NSMutableDictionary dictionary];
-    for (const auto & [key, value]: key_values) [record setValue:@(value.c_str()) forKey: @(key.c_str())];
-    return [(BonjourPublisherImpl *)impl setTXTRecordData:record];
+    for (const auto & [key, value]: key_values) [record setValue:[NSString stringWithFormat:@"%s",value.c_str()] forKey: @(key.c_str())];
+    return [(__bridge BonjourPublisherImpl *)impl setTXTRecordData:record];
 }
