@@ -10,7 +10,7 @@ void ofApp::setup(){
     browser.setFoundNotificationReceiver(&receiver);
     browser.startBrowse("_ofxbonjour_example._tcp");
     
-    publisher.setup();
+//    publisher.setup();
     publisher.publish("_ofxbonjour_example._tcp", "test_pub", 12345);
 }
 
