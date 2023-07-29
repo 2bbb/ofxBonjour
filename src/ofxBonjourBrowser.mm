@@ -9,6 +9,7 @@
 #include "ofxBonjourConstant.h"
 
 #include "ofLog.h"
+#include <map>
 
 static const std::string LogTag = "ofxBonjourBrowser";
 
@@ -27,6 +28,9 @@ static const std::string LogTag = "ofxBonjourBrowser";
           forDomain:(NSString *)domain;
 - (void)stopBrowse;
 - (void)setResolveTimeout:(float)resolveTimeout;
+
+@property (nonatomic, strong) NSMutableArray *services;
+
 
 @end
 
@@ -66,29 +70,60 @@ static const std::string LogTag = "ofxBonjourBrowser";
           didFindService:(NSNetService *)netService
               moreComing:(BOOL)moreComing
 {
-    NSNetService *service = [[NSNetService alloc] initWithDomain:netService.domain
-                                                            type:netService.type
-                                                            name:netService.name];
-    if(service) {
-        service.delegate = self;
-        [service resolveWithTimeout:resolveTimeout];
-    } else {
-        ofLogError(LogTag) << "connect failed.";
+//    NSNetService *service = [[NSNetService alloc] initWithDomain:netService.domain
+//                                                            type:netService.type
+//                                                            name:netService.name];
+//
+    if (!self.services) {
+        self.services = [[NSMutableArray alloc] init];
+    }
+
+    [self.services addObject:netService];
+    [netService setDelegate:self];
+    [netService resolveWithTimeout:3.0];
+    
+    if (moreComing) {
+        ofLogNotice("more coming?!");
     }
 }
 
 #pragma mark NSNetServiceDelegate
 
+- (void)netServiceBrowser:(NSNetServiceBrowser *)browser didNotSearch:(NSDictionary<NSString *, NSNumber *> *)errorDict {
+    NSLog(@"ofxBonjourBrowser: could not start browsing [%@] -- if \"NSNetServicesErrorCode\": -72008, make sure the service type is included in the \"Bonjour Services\" array in info.plist ", errorDict);
+}
+
 - (void)netServiceDidResolveAddress:(NSNetService *)netService {
-    NSString *name = netService.name;
-    NSString *ip = [self getStringFromAddressData:[netService.addresses objectAtIndex:0]];
-    NSString *type = netService.type;
-    NSString *domain = netService.domain;
-    std::uint16_t port = netService.port;
-    ofLogVerbose(LogTag) << "found: " << type.UTF8String << " : " << name.UTF8String << " = " << ip.UTF8String << ":" << port;
-    
-    delegate->foundService(type.UTF8String, name.UTF8String, ip.UTF8String, domain.UTF8String, port);
-    [netService release];
+    if ([netService.addresses count] >0) {
+        NSString *name = netService.name;
+        NSString *ip = [self getStringFromAddressData:[netService.addresses objectAtIndex:0]];
+        ofLogNotice("IPs found for ") << [name UTF8String];
+        for (id object in netService.addresses) {
+            NSString *v = [self getStringFromAddressData:object];
+            ofLogNotice("...") << [v UTF8String];
+            if ( ![v isEqualToString:@"0.0.0.0"] && ! [v hasPrefix:@"169"]) {
+                ip = v;
+            }
+        }
+        NSString *type = netService.type;
+        NSString *domain = netService.domain;
+        std::uint16_t port = netService.port;
+        ofLogNotice(LogTag) << "found: " << type.UTF8String << " : " << name.UTF8String << " = " << ip.UTF8String << ":" << port;
+        
+        std::map<std::string, std::string> txt;
+        
+        NSDictionary * dict = [NSNetService dictionaryFromTXTRecordData:netService.TXTRecordData];
+
+        for (NSString *nskey in dict) {
+            std::string key = [nskey UTF8String];
+            std::string val = [[[NSString alloc] initWithData:[dict objectForKey:nskey] encoding:NSUTF8StringEncoding] UTF8String];
+            txt[key] = val;
+        }
+            
+        delegate->foundService(type.UTF8String, name.UTF8String, ip.UTF8String, domain.UTF8String, port, txt);
+    } else {
+        ofLogNotice(LogTag) << "found, but empty addresses: " << netService.name.UTF8String;
+    }
 }
 
 - (NSString *)getStringFromAddressData:(NSData *)dataIn {
@@ -97,17 +132,12 @@ static const std::string LogTag = "ofxBonjourBrowser";
     return ipString;
 }
 
-- (void)dealloc {
-    [browser release];
-    [super dealloc];
-}
-
 @end
 
 ofxBonjourBrowser::ofxBonjourBrowser()
-    : impl([[BonjourBrowserImpl alloc] init])
+: impl((__bridge_retained void *)[[BonjourBrowserImpl alloc] init])
 {
-    [(BonjourBrowserImpl *)impl setDelegate:this];
+    [(__bridge BonjourBrowserImpl *)impl setDelegate:this];
     receiver = NULL;
 }
 
@@ -115,22 +145,24 @@ void ofxBonjourBrowser::setup() {
 }
 
 void ofxBonjourBrowser::startBrowse(const std::string &type, const std::string &domain) {
-    [(BonjourBrowserImpl *)impl startBrowse:@(type.c_str())
-                                  forDomain:@(domain.c_str())];
+    [(__bridge BonjourBrowserImpl *)impl startBrowse:@(type.c_str())
+                                           forDomain:@(domain.c_str())];
 }
 
 void ofxBonjourBrowser::stopBrowse() {
-    [(BonjourBrowserImpl *)impl stopBrowse];
+    [(__bridge BonjourBrowserImpl *)impl stopBrowse];
 }
 
 void ofxBonjourBrowser::foundService(const std::string &type,
                                      const std::string &name,
                                      const std::string &ip,
                                      const std::string &domain,
-                                     const std::uint16_t port)
+                                     const std::uint16_t port,
+                                     std::map<std::string,std::string> txt)
 {
+    ofLogNotice("ofxBonjourBrowser::foundService()");
     if(receiver != NULL) {
-        receiver->foundService(type, name, ip, domain, port);
+        receiver->foundService(type, name, ip, domain, port, txt);
     }
     ofxBonjourServiceInfo info = (ofxBonjourServiceInfo){
         .type   = type,
@@ -154,7 +186,7 @@ std::vector<ofxBonjourServiceInfo> ofxBonjourBrowser::getLastFoundServiceInfo() 
 }
 
 void ofxBonjourBrowser::setResolveTimeout(float resolveTimeout) {
-    [(BonjourBrowserImpl *)impl setResolveTimeout:resolveTimeout];
+    [(__bridge BonjourBrowserImpl *)impl setResolveTimeout:resolveTimeout];
 }
 
 void ofxBonjourBrowser::setFoundNotificationReceiver(ofxBonjourBrowserFoundNotificationReceiverInterface *receiver) {

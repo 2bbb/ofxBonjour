@@ -15,9 +15,11 @@
 class ofxBonjourPublisher {
 public:
     ofxBonjourPublisher();
-    ~ofxBonjourPublisher();
-    void setup();
+//    void setup();
     bool publish(std::string type, std::string name, std::uint16_t port, std::string domain = "");
+    bool setTextRecord(std::string key, std::string value) { setTextRecords({{key, value}}); return true; };
+    bool setTextRecords(std::vector<std::pair<std::string, std::string>> key_values);
+
 private:
     void *impl;
 };

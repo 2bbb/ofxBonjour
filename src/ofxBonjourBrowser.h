@@ -9,6 +9,7 @@
 
 #include <string>
 #include <vector>
+#include <map>
 
 struct ofxBonjourServiceInfo {
     std::string type;
@@ -20,7 +21,7 @@ struct ofxBonjourServiceInfo {
 
 class ofxBonjourBrowserFoundNotificationReceiverInterface {
 public:
-    virtual void foundService(const std::string &type, const std::string &name, const std::string &ip, const std::string &domain, const std::uint16_t port) = 0;
+    virtual void foundService(const std::string &type, const std::string &name, const std::string &ip, const std::string &domain, const std::uint16_t port, std::map<std::string,std::string> txt) = 0;
 };
 
 class ofxBonjourBrowser {
@@ -30,7 +31,7 @@ public:
     void setup();
     void startBrowse(const std::string &type, const std::string &domain = "");
     void stopBrowse();
-    void foundService(const std::string &type, const std::string &name, const std::string &ip, const std::string &domain, const std::uint16_t port);
+    void foundService(const std::string &type, const std::string &name, const std::string &ip, const std::string &domain, const std::uint16_t port, std::map<std::string,std::string> txt);
     
     const std::vector<ofxBonjourServiceInfo> &getFoundServiceInfo() const;
     std::vector<ofxBonjourServiceInfo> getLastFoundServiceInfo();

@@ -9,7 +9,10 @@
 
 #include "ofConstants.h"
 
+#if !TARGET_OS_IOS
 #import <Cocoa/Cocoa.h>
+#endif
+
 #import <CFNetwork/CFNetwork.h>
 
 #include <sys/socket.h>

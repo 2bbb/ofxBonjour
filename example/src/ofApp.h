@@ -26,7 +26,7 @@ private:
     class NotificationReceiver : public ofxBonjourBrowserFoundNotificationReceiverInterface {
         static const std::string LogTag;
         
-        void foundService(const std::string &type, const std::string &name, const std::string &ip, const std::string &domain, const std::uint16_t port) override {
+		void foundService(const std::string &type, const std::string &name, const std::string &ip, const std::string &domain, const std::uint16_t port, std::map<std::string,std::string> txt) override {
             ofLogVerbose(LogTag) << "Found Device: " << type << ", " << name << "@" << ip << " in " << domain;
         }
     } receiver;

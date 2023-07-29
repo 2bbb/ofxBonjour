@@ -13,7 +13,7 @@
 static const std::string LogTag = "ofxBonjourPublisher";
 
 @interface BonjourPublisherImpl : NSObject {
-    NSSocketPort* socket;
+//    NSSocketPort* socket;
     NSNetService *service;
 }
 
@@ -21,6 +21,8 @@ static const std::string LogTag = "ofxBonjourPublisher";
                   name:(NSString *)name
                   port:(int)port
                 domain:(NSString *)domain;
+
+- (BOOL)setTXTRecordData:(NSDictionary *)record;
 
 @end
 
@@ -31,8 +33,9 @@ static const std::string LogTag = "ofxBonjourPublisher";
                   port:(int)port
                 domain:(NSString *)domain
 {
-    socket = [[NSSocketPort alloc] initWithTCPPort:port];
-    if (socket) {
+//    socket = [[NSSocketPort alloc] initWithTCPPort:port];
+//    if (socket) {
+    
         service = [[NSNetService alloc] initWithDomain:domain
                                                   type:type
                                                   name:name
@@ -42,35 +45,54 @@ static const std::string LogTag = "ofxBonjourPublisher";
             [service publish];
         } else {
             ofLogVerbose(LogTag) << "invalid NSNetSevice";
+            return NO;
         }
+//    } else {
+//        ofLogVerbose(LogTag) << "invalid NSSocketPort";
+//        return NO;
+//    }
+    return YES;
+}
+
+- (BOOL)setTXTRecordData:(NSDictionary *)record
+{
+    if (service) {
+        // TODO: check that the record is within the mDNS limits
+
+        return [service setTXTRecordData:[NSNetService dataFromTXTRecordDictionary:record]];
     } else {
-        ofLogVerbose(LogTag) << "invalid NSSocketPort";
+        ofLogVerbose(LogTag) << "cannot set mDNS data: NSNetSevice not instanciated";
+        return NO;
     }
 }
 
-- (void)dealloc {
-    [socket release];
-    [service release];
-    
-    [super dealloc];
-}
+//- (void)dealloc {
+//    [socket release];
+//    [service release];
+//
+//    [super dealloc];
+//}
 
 @end
 
 ofxBonjourPublisher::ofxBonjourPublisher()
-    : impl([[BonjourPublisherImpl alloc] init]) {}
+: impl((__bridge_retained void *)[[BonjourPublisherImpl alloc] init]) {}
 
-ofxBonjourPublisher::~ofxBonjourPublisher() {
-    [(BonjourPublisherImpl *)impl release];
-}
+//__bridge
 
-void ofxBonjourPublisher::setup() {
-    
-}
+//void ofxBonjourPublisher::setup() {
+//    
+//}
 
 bool ofxBonjourPublisher::publish(std::string type, std::string name, std::uint16_t port, std::string domain) {
-    return [(BonjourPublisherImpl *)impl publishForType:@(type.c_str())
+    return [(__bridge BonjourPublisherImpl *)impl publishForType:@(type.c_str())
                                                    name:@(name.c_str())
                                                    port:port
                                                  domain:@(domain.c_str())] ? true : false;
+}
+
+bool ofxBonjourPublisher::setTextRecords(std::vector<std::pair<std::string, std::string>> key_values = {}) {
+    NSMutableDictionary * record = [NSMutableDictionary dictionary];
+    for (const auto & [key, value]: key_values) [record setValue:[NSString stringWithFormat:@"%s",value.c_str()] forKey: @(key.c_str())];
+    return [(__bridge BonjourPublisherImpl *)impl setTXTRecordData:record];
 }
